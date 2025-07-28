@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'screen_operator_services.dart';
 
 import '../api_services/api.dart';
 import '../models/operator.dart';
@@ -33,7 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _startAutoSlide(int length) {
-    if (_isSlideshowStarted || length <= 1) return; // فقط یک‌بار اجرا شود
+    if (_isSlideshowStarted || length <= 1) return;
     _isSlideshowStarted = true;
 
     _timer = Timer.periodic(const Duration(seconds: 4), (timer) {
@@ -125,7 +126,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     return const Center(child: Text('هیچ تصویری برای نمایش نیست.'));
                   }
 
-                  // فقط یک‌بار اسلایدشو را شروع کن
                   WidgetsBinding.instance.addPostFrameCallback((_) {
                     _startAutoSlide(images.length);
                   });
@@ -168,7 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           );
                         },
                       ),
-                      // 🔹 دکمه قبلی
                       Positioned(
                         left: 8,
                         top: MediaQuery.of(context).size.height * 0.18,
@@ -182,7 +181,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      // 🔹 دکمه بعدی
                       Positioned(
                         right: 8,
                         top: MediaQuery.of(context).size.height * 0.18,
@@ -196,7 +194,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                       ),
-                      // 🔹 دایره‌ها
                       Positioned(
                         bottom: 10,
                         left: 0,
@@ -222,7 +219,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // 🔷 نمایش اپراتورها
+            // 🔷 اپراتورها
             Expanded(
               child: FutureBuilder<List<Operator>>(
                 future: _operatorFuture,
@@ -252,26 +249,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     itemCount: operators.length,
                     itemBuilder: (context, index) {
                       final operator = operators[index];
-                      return Card(
-                        elevation: 3,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            operator.logo.isNotEmpty
-                                ? Image.network(
-                              operator.logo,
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.contain,
-                              errorBuilder: (_, __, ___) =>
-                              const Icon(Icons.broken_image, size: 80),
-                            )
-                                : const Icon(Icons.account_circle, size: 80),
-                            const SizedBox(height: 8),
-                            Text(operator.name,
+
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => OperatorServicesScreen(operatorData: operator),
+                            ),
+                          );
+                        },
+                        child: Card(
+                          elevation: 3,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              operator.logo.isNotEmpty
+                                  ? Image.network(
+                                operator.logo,
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.contain,
+                                errorBuilder: (_, __, ___) =>
+                                const Icon(Icons.broken_image, size: 80),
+                              )
+                                  : const Icon(Icons.account_circle, size: 80),
+                              const SizedBox(height: 8),
+                              Text(
+                                operator.name,
                                 style: const TextStyle(fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center),
-                          ],
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -285,7 +295,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
-
-
