@@ -1,9 +1,10 @@
-// lib/screens/screen_operator_services.dart
+
 
 import 'package:flutter/material.dart';
 import '../models/operator.dart';
 import '../models/service_package.dart';
 import '../api_services/api.dart';
+import 'packages_screen.dart';
 
 class OperatorServicesScreen extends StatefulWidget {
   final Operator operatorData;
@@ -152,8 +153,14 @@ class _OperatorServicesScreenState extends State<OperatorServicesScreen> {
                         child: InkWell(
                           borderRadius: BorderRadius.circular(16),
                           onTap: () {
-                            // عملکرد کلیک (آینده)
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PackagesScreen(service: service),
+                              ),
+                            );
                           },
+
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
