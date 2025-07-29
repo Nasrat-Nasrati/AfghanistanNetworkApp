@@ -140,14 +140,30 @@ class PackagesScreen extends StatelessWidget {
                           fontSize: 16,
                         ),
                       ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BandelScreen(packageName: pkg.name),
-                          ),
-                        );
-                      },
+
+
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BandelScreen(
+                                packageId: pkg.id,
+                                packageName: pkg.name, // باید نام را هم ارسال کنی
+                              ),
+                            ),
+                          );
+                        }
+
+
+
+                      // onTap: () {
+                      //   Navigator.push(
+                      //     context,
+                      //     MaterialPageRoute(
+                      //       builder: (context) => BandelScreen(packageName: pkg.name),
+                      //     ),
+                      //   );
+                      // },
 
                     ),
                   );

@@ -72,16 +72,20 @@ class ApiService {
     final url = Uri.parse('${baseUrl}package-details/');
     try {
       final response = await http.get(url);
+
       if (response.statusCode == 200) {
         List jsonList = jsonDecode(response.body);
         return jsonList.map((json) => PackageDetail.fromJson(json)).toList();
       } else {
+        print('🛑 پاسخ سرور: ${response.statusCode} | بدنه: ${response.body}');
         throw Exception('خطا در دریافت جزئیات پکیج');
       }
     } catch (e) {
+      print('❌ خطای واقعی: $e');
       throw Exception('ارتباط با سرور قطع است (PackageDetail)');
     }
   }
+
 
   /// 🖼️ دریافت لیست تصاویر گالری
   static Future<List<Gallery>> fetchGallery() async {
