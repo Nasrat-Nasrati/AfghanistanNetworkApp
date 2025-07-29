@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/service_package.dart';
 import '../models/package.dart';
 import '../api_services/api.dart';
+import 'bandel_screen.dart';
 
 class PackagesScreen extends StatelessWidget {
   final ServicePackage service;
@@ -140,8 +141,14 @@ class PackagesScreen extends StatelessWidget {
                         ),
                       ),
                       onTap: () {
-                        // در آینده جزئیات بیشتر نمایش داده می‌شود
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BandelScreen(packageName: pkg.name),
+                          ),
+                        );
                       },
+
                     ),
                   );
                 },
