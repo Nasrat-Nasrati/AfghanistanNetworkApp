@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../models/package_detail.dart';
 import '../api_services/api.dart';
 
@@ -52,9 +53,7 @@ class BandelScreen extends StatelessWidget {
                 .toList();
 
             if (filtered.isEmpty) {
-              return const Center(
-                child: Text('هیچ بسته‌ای یافت نشد.'),
-              );
+              return const Center(child: Text('هیچ بسته‌ای یافت نشد.'));
             }
 
             return Padding(
@@ -75,7 +74,7 @@ class BandelScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // نام بسته و قیمت در یک ردیف
+                          // نام بسته و قیمت
                           Row(
                             children: [
                               _buildInfoCardSmall(
@@ -94,7 +93,7 @@ class BandelScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
 
-                          // کدهای فعال‌سازی و غیره
+                          // کدهای USSD
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
@@ -102,50 +101,55 @@ class BandelScreen extends StatelessWidget {
                               if (item.activationCode != null)
                                 _buildInfoCardSmall(
                                   'کد فعال‌سازی',
-                                  item.activationCode!,
+                                  'برای فعال‌سازی ${item.activationCode} را دایل کنید',
                                   Colors.green.shade100,
                                 ),
                               if (item.deactivationCode != null)
                                 _buildInfoCardSmall(
-                                  'غیرفعال‌سازی',
-                                  item.deactivationCode!,
+                                  'کد غیرفعال‌سازی',
+                                  'برای غیرفعال‌سازی ${item.deactivationCode} را دایل کنید',
                                   Colors.red.shade100,
                                 ),
-                              if (item.checkBalanceCode != null)
-                                _buildInfoCardSmall(
-                                  'بررسی موجودی',
-                                  item.checkBalanceCode!,
-                                  Colors.orange.shade100,
-                                ),
+
                             ],
                           ),
-                          const SizedBox(height: 10),
 
-                          // دکمه‌ها - در یک ردیف (Row) با فاصله کم و متن سیاه
+                          const SizedBox(height: 12),
+
+                          // دکمه‌ها
                           Center(
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                if (item.buttonActive.isNotEmpty)
+                                if (item.activationCode != null &&
+                                    _isValidUSSD(item.activationCode!))
                                   Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
                                     child: _buildMiniButton(
-                                        'فعال‌سازی', Colors.green),
+                                      'فعال‌سازی',
+                                      Colors.green,
+                                      item.activationCode!,
+                                    ),
                                   ),
-                                if (item.buttonDeactive.isNotEmpty)
+                                if (item.deactivationCode != null &&
+                                    _isValidUSSD(item.deactivationCode!))
                                   Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
                                     child: _buildMiniButton(
-                                        'غیرفعال‌سازی', Colors.red),
+                                      'غیرفعال‌سازی',
+                                      Colors.red,
+                                      item.deactivationCode!,
+                                    ),
                                   ),
-                                if (item.buttonCheckBalance.isNotEmpty)
+                                if (item.checkBalanceCode != null &&
+                                    _isValidUSSD(item.checkBalanceCode!))
                                   Padding(
-                                    padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
+                                    padding: const EdgeInsets.symmetric(horizontal: 14),
                                     child: _buildMiniButton(
-                                        'بررسی موجودی', Colors.orange),
+                                      'بررسی موجودی',
+                                      Colors.orange,
+                                      item.checkBalanceCode!,
+                                    ),
                                   ),
                               ],
                             ),
@@ -163,7 +167,26 @@ class BandelScreen extends StatelessWidget {
     );
   }
 
-  // کارت فشرده با عرض کوچک برای نمایش داده‌ها
+  // بررسی اعتبار کد USSD
+  bool _isValidUSSD(String code) {
+    final trimmed = code.trim();
+    return trimmed.startsWith("*") &&
+        trimmed.endsWith("#") &&
+        trimmed.length >= 4;
+  }
+
+  // اجرای USSD
+  Future<void> _dialUSSDCode(String code) async {
+    final trimmed = code.trim();
+    final Uri ussdUri = Uri(scheme: 'tel', path: Uri.encodeComponent(trimmed));
+    if (await canLaunchUrl(ussdUri)) {
+      await launchUrl(ussdUri);
+    } else {
+      debugPrint('⛔ اجرای USSD ممکن نیست: $code');
+    }
+  }
+
+  // کارت اطلاعات
   Widget _buildInfoCardSmall(String label, String value, Color bgColor) {
     return Expanded(
       child: Container(
@@ -186,14 +209,14 @@ class BandelScreen extends StatelessWidget {
     );
   }
 
-  // دکمه‌ها با رنگ متن سیاه
-  Widget _buildMiniButton(String label, Color color) {
+  // دکمه اجرای USSD
+  Widget _buildMiniButton(String label, Color color, String code) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () => _dialUSSDCode(code),
       style: ElevatedButton.styleFrom(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        backgroundColor: color.withOpacity(0.2), // رنگ ملایم‌تر
-        foregroundColor: Colors.black, // رنگ متن سیاه
+        backgroundColor: color.withOpacity(0.2),
+        foregroundColor: Colors.black,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -204,13 +227,9 @@ class BandelScreen extends StatelessWidget {
         ),
       ),
       child: Center(
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-        ),
+        child: Text(label),
       ),
     );
   }
 }
-
 
