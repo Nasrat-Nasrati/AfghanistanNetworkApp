@@ -7,7 +7,13 @@ import '../models/package_detail.dart';
 import '../models/gallery.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://172.16.3.236:8000/api/'; // ← آدرس IP سرور Django را بگذارید
+  //
+  // static const String baseUrl = 'https://afgnetworkapp.onrender.com/api/';
+
+  // static const String baseUrl = 'http://172.16.3.236:8000/api/'; // ← آدرس IP سرور Django را بگذارید
+  // this is the dajngo python anywhere server
+  static const String baseUrl = 'https://nasrat.pythonanywhere.com/api/';// ← آدرس IP سرور Django را بگذارید
+
 
   /// 📡 بررسی اتصال به سرور
   static Future<bool> checkServer() async {
