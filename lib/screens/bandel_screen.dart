@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../models/package_detail.dart';
 import '../api_services/api.dart';
 
@@ -93,67 +92,34 @@ class BandelScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 10),
 
-                          // کدهای USSD
-                          Wrap(
-                            spacing: 8,
-                            runSpacing: 8,
-                            children: [
-                              if (item.activationCode != null)
-                                _buildInfoCardSmall(
-                                  'کد فعال‌سازی',
-                                  'برای فعال‌سازی ${item.activationCode} را دایل کنید',
-                                  Colors.green.shade100,
-                                ),
-                              if (item.deactivationCode != null)
-                                _buildInfoCardSmall(
-                                  'کد غیرفعال‌سازی',
-                                  'برای غیرفعال‌سازی ${item.deactivationCode} را دایل کنید',
-                                  Colors.red.shade100,
-                                ),
-
-                            ],
-                          ),
-
-                          const SizedBox(height: 12),
-
-                          // دکمه‌ها
-                          Center(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                if (item.activationCode != null &&
-                                    _isValidUSSD(item.activationCode!))
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                                    child: _buildMiniButton(
-                                      'فعال‌سازی',
-                                      Colors.green,
-                                      item.activationCode!,
-                                    ),
-                                  ),
-                                if (item.deactivationCode != null &&
-                                    _isValidUSSD(item.deactivationCode!))
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                                    child: _buildMiniButton(
-                                      'غیرفعال‌سازی',
-                                      Colors.red,
-                                      item.deactivationCode!,
-                                    ),
-                                  ),
-                                if (item.checkBalanceCode != null &&
-                                    _isValidUSSD(item.checkBalanceCode!))
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                                    child: _buildMiniButton(
-                                      'بررسی موجودی',
-                                      Colors.orange,
-                                      item.checkBalanceCode!,
-                                    ),
-                                  ),
-                              ],
+                          // نمایش مستقیم کدهای USSD بدون دکمه
+                          if (item.activationCode != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: _buildInfoCardSmall(
+                                'کد فعال‌سازی',
+                                item.activationCode!,
+                                Colors.green.shade50,
+                              ),
                             ),
-                          ),
+                          if (item.deactivationCode != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: _buildInfoCardSmall(
+                                'کد غیرفعال‌سازی',
+                                item.deactivationCode!,
+                                Colors.red.shade50,
+                              ),
+                            ),
+                          if (item.checkBalanceCode != null)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: _buildInfoCardSmall(
+                                'کد بررسی موجودی',
+                                item.checkBalanceCode!,
+                                Colors.orange.shade50,
+                              ),
+                            ),
                         ],
                       ),
                     ),
@@ -165,25 +131,6 @@ class BandelScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  // بررسی اعتبار کد USSD
-  bool _isValidUSSD(String code) {
-    final trimmed = code.trim();
-    return trimmed.startsWith("*") &&
-        trimmed.endsWith("#") &&
-        trimmed.length >= 4;
-  }
-
-  // اجرای USSD
-  Future<void> _dialUSSDCode(String code) async {
-    final trimmed = code.trim();
-    final Uri ussdUri = Uri(scheme: 'tel', path: Uri.encodeComponent(trimmed));
-    if (await canLaunchUrl(ussdUri)) {
-      await launchUrl(ussdUri);
-    } else {
-      debugPrint('⛔ اجرای USSD ممکن نیست: $code');
-    }
   }
 
   // کارت اطلاعات
@@ -208,28 +155,10 @@ class BandelScreen extends StatelessWidget {
       ),
     );
   }
-
-  // دکمه اجرای USSD
-  Widget _buildMiniButton(String label, Color color, String code) {
-    return ElevatedButton(
-      onPressed: () => _dialUSSDCode(code),
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        backgroundColor: color.withOpacity(0.2),
-        foregroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        elevation: 1,
-        textStyle: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      child: Center(
-        child: Text(label),
-      ),
-    );
-  }
 }
+
+
+
+
+
 
