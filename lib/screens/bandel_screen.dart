@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import '../models/package_detail.dart';
 import '../api_services/api.dart';
@@ -47,9 +48,20 @@ class BandelScreen extends StatelessWidget {
             }
 
             final allDetails = snapshot.data ?? [];
-            final filtered = allDetails
-                .where((detail) => detail.package.id == packageId)
-                .toList();
+
+            // لاگ برای بررسی داده‌های دریافتی
+            for (var detail in allDetails) {
+              print('📦 دریافت شده: detail.package.id = ${detail.package.id} | name = ${detail.name}');
+            }
+
+            // لاگ مقدار ورودی دریافتی
+            print('📥 مقدار ورودی packageId: $packageId');
+
+            // فیلتر کردن با تطبیق رشته‌ای برای جلوگیری از خطاهای نوع داده
+            final filtered = allDetails.where((detail) =>
+            detail.package.id.toString() == packageId.toString()).toList();
+
+            print('🎯 تعداد بسته‌های فیلتر شده: ${filtered.length}');
 
             if (filtered.isEmpty) {
               return const Center(child: Text('هیچ بسته‌ای یافت نشد.'));
@@ -73,26 +85,27 @@ class BandelScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // نام بسته و قیمت
                           Row(
                             children: [
-                              _buildInfoCardSmall(
-                                'نام بسته',
-                                item.name,
-                                Colors.lightBlue.shade50,
+                              Expanded(
+                                child: _buildInfoCardSmall(
+                                  'نام بسته',
+                                  item.name,
+                                  Colors.lightBlue.shade50,
+                                ),
                               ),
                               const SizedBox(width: 10),
                               if (item.price != null)
-                                _buildInfoCardSmall(
-                                  'قیمت',
-                                  '${item.price} افغانی',
-                                  Colors.green.shade50,
+                                Expanded(
+                                  child: _buildInfoCardSmall(
+                                    'قیمت',
+                                    '${item.price} افغانی',
+                                    Colors.green.shade50,
+                                  ),
                                 ),
                             ],
                           ),
                           const SizedBox(height: 10),
-
-                          // نمایش مستقیم کدهای USSD بدون دکمه
                           if (item.activationCode != null)
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 4),
@@ -133,32 +146,25 @@ class BandelScreen extends StatelessWidget {
     );
   }
 
-  // کارت اطلاعات
   Widget _buildInfoCardSmall(String label, String value, Color bgColor) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            '$label: $value',
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w600,
-            ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Center(
+        child: Text(
+          '$label: $value',
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ),
     );
   }
 }
-
-
-
-
 
 
