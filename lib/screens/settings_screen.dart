@@ -1,31 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/settings_provider.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
-}
-
-enum FontSizeOption { small, medium, large }
-
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _isDarkMode = false;
-  FontSizeOption _fontSize = FontSizeOption.medium;
-
-  @override
   Widget build(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context);
+    final isDark = settings.isDarkMode;
+    final fontSize = settings.fontSize;
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        backgroundColor: _isDarkMode ? Colors.grey.shade900 : Colors.grey.shade100,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         appBar: AppBar(
-          title: const Text(
-            'تنظیمات',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          backgroundColor: _isDarkMode ? Colors.grey.shade800 : Colors.blue,
+          title: const Text('تنظیمات'),
           centerTitle: true,
+          backgroundColor: isDark ? Colors.grey.shade800 : Colors.blue,
         ),
         body: ListView(
           children: [
@@ -33,72 +26,56 @@ class _SettingsScreenState extends State<SettingsScreen> {
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'تنظیمات عمومی',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-
-            // حالت شب / روز
             SwitchListTile(
               title: const Text('حالت شب'),
               subtitle: const Text('فعال‌سازی یا غیرفعال‌سازی حالت تاریک'),
-              value: _isDarkMode,
+              value: isDark,
               onChanged: (value) {
-                setState(() {
-                  _isDarkMode = value;
-                });
+                settings.toggleDarkMode(value);
               },
               secondary: const Icon(Icons.dark_mode),
             ),
-
             const Divider(),
-
-            // اندازه فونت
             const Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'اندازه فونت',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             RadioListTile<FontSizeOption>(
               title: const Text('کوچک'),
               value: FontSizeOption.small,
-              groupValue: _fontSize,
+              groupValue: fontSize,
               onChanged: (value) {
-                setState(() {
-                  _fontSize = value!;
-                });
+                settings.updateFontSize(value!);
               },
             ),
             RadioListTile<FontSizeOption>(
               title: const Text('متوسط'),
               value: FontSizeOption.medium,
-              groupValue: _fontSize,
+              groupValue: fontSize,
               onChanged: (value) {
-                setState(() {
-                  _fontSize = value!;
-                });
+                settings.updateFontSize(value!);
               },
             ),
             RadioListTile<FontSizeOption>(
               title: const Text('بزرگ'),
               value: FontSizeOption.large,
-              groupValue: _fontSize,
+              groupValue: fontSize,
               onChanged: (value) {
-                setState(() {
-                  _fontSize = value!;
-                });
+                settings.updateFontSize(value!);
               },
             ),
-
             const Divider(),
-
-            // تنظیمات آینده
             const Padding(
               padding: EdgeInsets.all(16.0),
               child: Text(
                 'سایر تنظیمات',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
             const ListTile(
